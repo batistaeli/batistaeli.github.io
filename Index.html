@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elizael Batista | Web Designer & Front-End</title>
+    <style>
+        :root {
+            --primary: #38bdf8; 
+            --primary-dark: #2563eb;
+            --dark: #050a18; 
+            --light: #f8fafc;
+            --white: #ffffff;
+            --gray: #64748b;
+            --text-dark: #1e293b;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--light);
+            color: var(--text-dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Fundo moderno com gradiente sutil e estático */
+            background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent),
+                        radial-gradient(circle at bottom left, rgba(37, 99, 235, 0.05), transparent);
+            background-attachment: fixed;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(5, 10, 24, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(56, 189, 248, 0.2);
+            padding: 1rem 0;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-link:hover { color: var(--primary); }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0; height: 2px;
+            bottom: -5px; left: 0;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after { width: 100%; }
+
+        .hero {
+            position: relative;
+            background-color: var(--dark);
+            height: 70vh;
+            min-height: 550px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+            overflow: hidden;
+            padding-top: 60px;
+        }
+
+        #particleCanvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2; 
+            padding: 2.5rem 3rem;
+            background: rgba(5, 10, 24, 0.6); 
+            border-radius: 20px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .profile-pic {
+            width: 130px;
+            height: 130px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--primary);
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        .profile-pic:hover { transform: scale(1.05) rotate(5deg); }
+
+        .hero h1 { margin: 0; font-size: 3.5rem; letter-spacing: -1px; text-transform: uppercase; text-shadow: 0 0 15px rgba(56, 189, 248, 0.5); }
+        .hero .subtitle { color: var(--primary); font-weight: bold; font-size: 1.2rem; margin-top: 0.5rem; letter-spacing: 2px; margin-bottom: 2rem; }
+
+        .hero-buttons { display: flex; gap: 1rem; }
+        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--primary); padding: 0.8rem 1.8rem; border-radius: 50px; text-decoration: none; font-weight: bold; transition: all 0.3s; }
+        .btn-outline:hover { background: var(--primary); color: var(--dark); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 5rem 2rem 2rem 2rem; position: relative; z-index: 5; }
+        section { margin-bottom: 6rem; padding-top: 80px; margin-top: -80px; }
+        h2 { border-left: 5px solid var(--primary-dark); padding-left: 15px; margin-bottom: 3rem; text-transform: uppercase; letter-spacing: 1px; color: var(--dark); }
+
+        .fade-in-section { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease-out, transform 0.8s ease-out; will-change: opacity, visibility; }
+        .fade-in-section.is-visible { opacity: 1; transform: translateY(0); }
+
+        .timeline-item { background: var(--white); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); border-left: 4px solid var(--primary-dark); transition: transform 0.3s ease, box-shadow 0.3s; }
+        .timeline-item:hover { transform: translateX(10px); box-shadow: 0 15px 20px rgba(0,0,0,0.08); }
+        .timeline-date { color: var(--primary-dark); font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
+        .timeline-title { margin: 0.5rem 0; font-size: 1.4rem; color: var(--dark); }
+        .institution { color: var(--gray); font-weight: 500; display: block; margin-bottom: 1rem; }
+
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1.5rem; }
+        .skill-item { background: var(--white); color: var(--dark); padding: 1.5rem; border-radius: 8px; text-align: center; font-weight: 600; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: all 0.3s ease; }
+        .skill-item:hover { background: var(--primary-dark); color: white; transform: translateY(-5px); box-shadow: 0 10px 15px rgba(37, 99, 235, 0.2); }
+
+        .projects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 2.5rem; }
+        .project-card { background: var(--white); border-radius: 16px; overflow: hidden; box-shadow: 0 15px 25px -5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s; cursor: pointer; display: flex; flex-direction: column; }
+        .project-card:hover { transform: translateY(-10px); box-shadow: 0 25px 30px rgba(37, 99, 235, 0.1); }
+        
+        .img-container { width: 100%; height: 200px; overflow: hidden; position: relative; flex-shrink: 0;}
+        .img-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #1e293b, #0f172a); background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.5); font-weight: bold; font-size: 1.2rem; letter-spacing: 2px; transition: transform 0.5s ease; }
+        
+        .project-card:hover .img-placeholder { transform: scale(1.1); }
+        .project-card .img-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(37, 99, 235, 0.8); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s ease; }
+        .project-card:hover .img-overlay { opacity: 1; }
+        .img-overlay span { color: white; font-weight: bold; border: 2px solid white; padding: 0.5rem 1.2rem; border-radius: 30px; text-transform: uppercase; font-size: 0.9rem; transform: translateY(20px); transition: transform 0.3s ease; }
+        .project-card:hover .img-overlay span { transform: translateY(0); }
+
+        .project-info { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
+        .project-info h3 { margin: 0 0 0.5rem 0; color: var(--dark); font-size: 1.15rem; transition: color 0.3s; line-height: 1.3;}
+        .project-card:hover .project-info h3 { color: var(--primary-dark); }
+        .project-info p { font-size: 0.9rem; color: var(--gray); margin: 0 0 1rem 0; flex-grow: 1;}
+        .tag { display: inline-block; background: #e0f2fe; color: var(--primary-dark); padding: 0.3rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: bold; margin-top: 0.2rem; margin-right: 0.3rem; }
+
+        footer { text-align: center; padding: 5rem 2rem 3rem 2rem; background: var(--dark); color: white; border-top: 5px solid var(--primary-dark); }
+        footer h2 { border: none; color: white; margin-bottom: 1rem; padding: 0; }
+        .contact-grid { display: flex; justify-content: center; align-items: center; gap: 4rem; margin-top: 3rem; margin-bottom: 3rem; flex-wrap: wrap; }
+        .contact-item h4 { color: var(--primary); margin: 0 0 0.5rem 0; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .contact-item p, .contact-item a { color: var(--light); text-decoration: none; font-size: 1.1rem; margin: 0; transition: color 0.3s ease; }
+        .contact-item a:hover { color: var(--primary-dark); }
+        .copyright { margin-top: 3rem; font-size: 0.9rem; color: #475569; border-top: 1px solid #1e293b; padding-top: 2rem; }
+
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- MODAL (LIGHTBOX) --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background-color: rgba(5, 10, 24, 0.95);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            opacity: 1;
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 80vh;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            object-fit: contain;
+            animation: zoomIn 0.3s ease;
+        }
+
+        .video-container, .local-video-container {
+            width: 80%;
+            max-width: 900px;
+            aspect-ratio: 16 / 9; 
+            display: none; 
+            animation: zoomIn 0.3s ease;
+            margin: auto;
+        }
+
+        .video-container iframe, .local-video-container video {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            border: none;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
+
+        /* Botão Fechar Melhorado para Mobile */
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 25px;
+            color: #f1f1f1;
+            font-size: 45px; font-weight: bold;
+            transition: 0.3s;
+            cursor: pointer;
+            z-index: 2001;
+            line-height: 1;
+        }
+        .close-modal:hover { color: var(--primary); }
+        
+        #caption { margin-top: 15px; color: white; font-size: 1.2rem; text-align: center; letter-spacing: 1px; max-width: 80%; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="nav-container">
+        <a href="#hero-section" class="nav-link">Início</a>
+        <a href="#about" class="nav-link">Sobre</a>
+        <a href="#experience" class="nav-link">Experiência</a>
+        <a href="#skills" class="nav-link">Habilidades</a>
+        <a href="#projects" class="nav-link">Projetos</a>
+        <a href="#contact" class="nav-link">Contato</a>
+    </div>
+</nav>
+
+<div class="hero" id="hero-section">
+    <canvas id="particleCanvas"></canvas>
+    <div class="hero-content">
+        <img src="Capa1.jpeg" alt="Foto de Perfil" class="profile-pic">
+        <h1>Elizael Batista</h1>
+        <p class="subtitle">WEB DESIGNER | FRONT-END | AUDIOVISUAL</p>
+        
+        <div class="hero-buttons">
+            <a href="#projects" class="btn-outline" style="background: var(--primary); color: var(--dark);">Ver Projetos</a>
+            <a href="Currículo profissional Elizael.pdf" target="_blank" class="btn-outline" download>Baixar currículo</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    
+    <section id="about" class="fade-in-section">
+        <h2>Sobre Mim</h2>
+        <p style="font-size: 1.1rem; color: var(--gray);">Profissional híbrido focado em design visual e desenvolvimento web. Minha trajetória une a precisão técnica do desenvolvimento Front-End com a criatividade do Design Gráfico e a sensibilidade do Audiovisual, entregando soluções completas que vão do conceito à tela, com forte foco em identidade institucional e profissionalismo.</p>
+    </section>
+
+    <section id="experience" class="fade-in-section">
+        <h2>Experiência Profissional</h2>
+        <div class="timeline-item">
+            <span class="timeline-date">Mar/2019 - Atualmente</span>
+            <h3 class="timeline-title">Especialista em Design Visual</h3>
+            <span class="institution">Batalhão de Polícia do Exército de Brasília (BPEB)</span>
+            <p>Atuação no desenvolvimento de identidades visuais e materiais promocionais institucionais. Responsável pela criação de logotipos, convites, cardápios, prismas e placas personalizadas. Cada projeto é pensado com foco em transmitir a identidade e a mensagem desejada de forma criativa e impactante, garantindo um resultado único e profissional.</p>
+        </div>
+    </section>
+
+    <section id="education" class="fade-in-section">
+        <h2>Educação</h2>
+        <div class="timeline-item">
+            <span class="timeline-date">Out/2024 - Dez/2024</span>
+            <h3 class="timeline-title">Design Gráfico Criativo</h3>
+            <span class="institution">SENAI</span>
+            <p>Estudos aprofundados em cores, tipografia, materiais promocionais, criação de arte e logotipos, além de técnicas de vetorização. Esse conhecimento me permite desenvolver projetos visuais impactantes e coerentes, com atenção à estética e à funcionalidade, sempre buscando transmitir a mensagem e identidade desejada.</p>
+        </div>
+        <div class="timeline-item">
+            <span class="timeline-date">Set/2021 - Dez/2021</span>
+            <h3 class="timeline-title">Desenvolvimento Frontend</h3>
+            <span class="institution">SENAI</span>
+            <p>Concluí um curso onde aprendi a programar em Portugol e desenvolvi habilidades em HTML, além de conhecimentos básicos em CSS e Java. Durante o curso, criei um site utilizando HTML, aplicando os fundamentos do desenvolvimento web e adquirindo uma base sólida para continuar explorando o universo da programação.</p>
+        </div>
+        <div class="timeline-item">
+            <span class="timeline-date">2015 - 2017</span>
+            <h3 class="timeline-title">Ensino Médio</h3>
+            <span class="institution">Centro de Ensino Elefante Branco</span>
+        </div>
+    </section>
+
+    <section id="skills" class="fade-in-section">
+        <h2>Habilidades Técnicas</h2>
+        <div class="skills-grid">
+            <div class="skill-item">Photoshop</div>
+            <div class="skill-item">Illustrator</div>
+            <div class="skill-item">Corel Draw</div>
+            <div class="skill-item">HTML / CSS</div>
+            <div class="skill-item">Canva</div>
+            <div class="skill-item">Edição de Vídeo</div>
+            <div class="skill-item">Fotografia</div>
+            <div class="skill-item">Vetorização</div>
+        </div>
+    </section>
+
+    <section id="projects" class="fade-in-section">
+        <h2>Projetos em Destaque</h2>
+        <div class="projects-grid">
+            
+            <div class="project-card" onclick="openModal('image', 'T1.1.jpeg', 'Folheto Informativo Digital da Clínica Veterinária BPEB')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('T1.1.jpeg');"></div>
+                    <div class="img-overlay"><span>Ampliar Arte</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>Informativo Digital da Clínica BPEB</h3>
+                    <p>Desenvolvido estrategicamente para sanar as principais dúvidas dos tutores, transmitindo a confiança e a disciplina da unidade no cuidado animal.</p>
+                    <div><span class="tag">Design Editorial</span><span class="tag">Informativo</span></div>
+                </div>
+            </div>
+            
+            <div class="project-card" onclick="openModal('local-video', 'meu-video.mp4', 'Guia Digital de Atendimento: Experiência do Usuário na Clínica BPEB')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('CapaVIdeo.jpg');"></div>
+                    <div class="img-overlay"><span>Assistir Vídeo</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>Guia Digital de Atendimento</h3>
+                    <p>Vídeo tutorial interativo criado para facilitar o acesso aos serviços via WhatsApp, humanizando o atendimento e orientando agendamentos autônomos.</p>
+                    <div><span class="tag">Audiovisual</span><span class="tag">UX Design</span></div>
+                </div>
+            </div>
+            
+            <div class="project-card" onclick="openModal('image', 'T3.png', 'Desenvolvimento de Identidade Visual: Camiseta Cinotécnica BPEB')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('T3.png');"></div>
+                    <div class="img-overlay"><span>Ampliar Arte</span></div> 
+                </div>
+                <div class="project-info">
+                    <h3>Identidade Visual: Camiseta Cinotécnica</h3>
+                    <p>Arte desenvolvida para a camiseta oficial do Encontro Cinotécnico, unindo a força operacional da unidade com a figura central do cão de trabalho.</p>
+                    <div><span class="tag">Corel Draw</span><span class="tag">Illustrator</span></div>
+                </div>
+            </div>
+            
+            <div class="project-card" onclick="openModal('image', 'T4.1.png', 'Da Arte ao Produto: Moedas Comemorativas 65 Anos BPEB')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('T4.1.png');"></div>
+                    <div class="img-overlay"><span>Ampliar Arte</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>Da Arte ao Produto: Moedas Comemorativas</h3>
+                    <p>Informativo criado para apresentar a evolução do projeto das medalhas exclusivas dos 65 anos do BPEB, destacando o rigor na transição do digital para o produto final.</p>
+                    <div><span class="tag">Design de Produto</span><span class="tag">Corel Draw</span></div>
+                </div>
+            </div>
+            
+            <div class="project-card" onclick="openModal('local-video', 'meu-video2.mp4', 'Arquitetura Web Completa: Estrutura, Estilo e Interação')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('T5.1.png');"></div>
+                    <div class="img-overlay"><span>Assistir Vídeo</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>Arquitetura Web Completa</h3>
+                    <p>Especialista em dar vida a ideias digitais. Domino o esqueleto (HTML) para uma base sólida, a pele (CSS) para design responsivo e a alma (JavaScript) para experiências dinâmicas.</p>
+                    <div><span class="tag">HTML/CSS</span><span class="tag">JavaScript</span></div>
+                </div>
+            </div>
+            
+            <div class="project-card" onclick="openModal('image', 'iinsta.jpeg', 'Gestão de Presença Digital: Instagram Oficial BPEB')">
+                <div class="img-container">
+                    <div class="img-placeholder" style="background-image: url('iinsta.jpeg');"></div>
+                    <div class="img-overlay"><span>Ampliar Arte</span></div>
+                </div>
+                <div class="project-info">
+                    <h3>Gestão de Presença Digital: Instagram BPEB</h3>
+                    <p>Atuação estratégica na curadoria e criação de conteúdo. Responsável pela concepção de artes e vídeos (Reels) que fortalecem a imagem institucional da unidade.</p>
+                    <div><span class="tag">Social Media</span><span class="tag">Branding</span></div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+</div>
+
+<footer id="contact">
+    <h2>Vamos Trabalhar Juntos?</h2>
+    <p style="color: #94a3b8; margin-bottom: 2rem;">Disponível para projetos de Design, Front-End e Audiovisual.</p>
+    
+    <div class="contact-grid">
+        <div class="contact-item">
+            <h4>Telefone / WhatsApp</h4>
+            <p>+55 (61) 9 9668-8292</p> 
+        </div>
+        <div class="contact-item">
+            <h4>E-mail</h4>
+            <a href="mailto:elizaelbatista72@gmail.com">elizaelbatista72@gmail.com</a> 
+        </div>
+        <div class="contact-item">
+            <h4>Página GitHub</h4>
+            <a href="https://github.com/batistaeli" target="_blank">github.com/batistaeli</a> 
+        </div>
+    </div>
+
+    <p class="copyright">© 2026 Elizael Batista Marques | Construído com código e design.</p>
+</footer>
+
+<div id="imageModal" class="modal">
+  <span class="close-modal" onclick="closeModal()">&times;</span>
+  <img class="modal-content" id="img01">
+  <div class="video-container" id="videoContainer">
+      <iframe id="videoIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+  </div>
+  <div class="local-video-container" id="localVideoContainer">
+      <video id="localVideoPlayer" controls>
+          Seu navegador não suporta o elemento de vídeo.
+      </video>
+  </div>
+  <div id="caption"></div>
+</div>
+
+<script>
+    const canvas = document.getElementById('particleCanvas');
+    const ctx = canvas.getContext('2d');
+    const heroSection = document.getElementById('hero-section');
+    canvas.width = heroSection.offsetWidth;
+    canvas.height = heroSection.offsetHeight;
+    let particlesArray = [];
+    class Particle {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.size = Math.random() * 2.5 + 1; 
+            this.speedX = Math.random() * 1 - 0.5; 
+            this.speedY = Math.random() * 1 - 0.5; 
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+            if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+        }
+        draw() {
+            ctx.fillStyle = 'rgba(56, 189, 248, 0.8)'; 
+            ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2); ctx.fill();
+        }
+    }
+    function initParticles() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.width * canvas.height) / 9000;
+        for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); }
+    }
+    function connectParticles() {
+        let opacityValue = 1;
+        for (let a = 0; a < particlesArray.length; a++) {
+            for (let b = a; b < particlesArray.length; b++) {
+                let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x)) +
+                               ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                if (distance < 15000) {
+                    opacityValue = 1 - (distance / 15000);
+                    ctx.strokeStyle = 'rgba(56, 189, 248,' + opacityValue + ')'; 
+                    ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                    ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke();
+                }
+            }
+        }
+    }
+    function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update(); particlesArray[i].draw();
+        }
+        connectParticles();
+    }
+    window.addEventListener('resize', function() {
+        canvas.width = heroSection.offsetWidth; canvas.height = heroSection.offsetHeight; initParticles();
+    });
+    initParticles(); animateParticles();
+
+    const faders = document.querySelectorAll('.fade-in-section');
+    const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
+    const appearOnScroll = new IntersectionObserver(function(entries, appearOnScroll) {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('is-visible');
+            appearOnScroll.unobserve(entry.target);
+        });
+    }, appearOptions);
+    faders.forEach(fader => { appearOnScroll.observe(fader); });
+
+    var modal = document.getElementById("imageModal");
+    var modalImg = document.getElementById("img01");
+    var videoContainer = document.getElementById("videoContainer");
+    var videoIframe = document.getElementById("videoIframe");
+    var localVideoContainer = document.getElementById("localVideoContainer");
+    var localVideoPlayer = document.getElementById("localVideoPlayer");
+    var captionText = document.getElementById("caption");
+
+    // Variável para guardar o src do Youtube (caso use) e não perder a referência original ao fechar
+    var currentVideoSrc = "";
+
+    function openModal(type, src, altText) {
+        modal.classList.add("show");
+        document.body.style.overflow = "hidden"; 
+        captionText.innerHTML = altText;
+        
+        modalImg.style.display = "none";
+        videoContainer.style.display = "none";
+        localVideoContainer.style.display = "none";
+
+        if (type === 'image') {
+            modalImg.style.display = "block"; 
+            modalImg.src = src;
+        } else if (type === 'video') { 
+            videoContainer.style.display = "block"; 
+            videoIframe.src = src;
+        } else if (type === 'local-video') { 
+            localVideoContainer.style.display = "block"; 
+            localVideoPlayer.src = src; 
+            localVideoPlayer.play(); 
+        }
+    }
+
+    function closeModal() {
+        modal.classList.remove("show"); 
+        document.body.style.overflow = "auto";
+        
+        setTimeout(() => {
+            // Se for vídeo do Youtube, remove o src para parar o som
+            videoIframe.src = ""; 
+            modalImg.src = ""; 
+            // Se for vídeo local, pausa o vídeo e remove a fonte
+            if(localVideoPlayer) {
+                localVideoPlayer.pause(); 
+                localVideoPlayer.src = "";
+            }
+        }, 300);
+    }
+
+    // Fecha ao clicar no fundo escuro (fora do conteúdo)
+    window.onclick = function(event) { 
+        if (event.target == modal) { closeModal(); } 
+    }
+    
+    // Fecha ao pressionar ESC
+    document.addEventListener('keydown', function(event){ 
+        if(event.key === "Escape"){ closeModal(); } 
+    });
+</script>
+</body>
+</html>
