@@ -76,7 +76,7 @@
             position: relative;
             background-color: var(--dark);
             height: 70vh;
-            min-height: 550px;
+            min-height: 600px; /* Aumentado ligeiramente para celular */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -204,7 +204,7 @@
         }
 
         .video-container, .local-video-container {
-            width: 80%;
+            width: 90%;
             max-width: 900px;
             aspect-ratio: 16 / 9; 
             display: none; 
@@ -218,11 +218,11 @@
             border-radius: 8px;
             border: none;
             box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            background: #000;
         }
 
         @keyframes zoomIn { from { transform: scale(0.9); } to { transform: scale(1); } }
 
-        /* Botão Fechar Melhorado para Mobile */
         .close-modal {
             position: absolute;
             top: 15px; right: 25px;
@@ -235,7 +235,45 @@
         }
         .close-modal:hover { color: var(--primary); }
         
-        #caption { margin-top: 15px; color: white; font-size: 1.2rem; text-align: center; letter-spacing: 1px; max-width: 80%; }
+        #caption { margin-top: 15px; color: white; font-size: 1.1rem; text-align: center; letter-spacing: 1px; max-width: 90%; }
+
+        /* ====================================================
+           MEDIA QUERIES (A MÁGICA DA RESPONSIVIDADE PARA CELULAR) 
+           ==================================================== */
+        @media (max-width: 768px) {
+            /* 1. Corrige o Menu Vazando */
+            .nav-container {
+                justify-content: flex-start;
+                padding: 0 1rem;
+                overflow-x: auto; /* Permite deslizar o menu para o lado */
+                gap: 1.5rem;
+                -ms-overflow-style: none;  /* Esconde a barrinha de rolagem */
+                scrollbar-width: none;  
+            }
+            .nav-container::-webkit-scrollbar { display: none; }
+            .nav-link { white-space: nowrap; font-size: 0.85rem; }
+
+            /* 2. Corrige Textos Gigantes na Capa */
+            .hero-content {
+                width: 85%;
+                padding: 2rem 1.5rem;
+            }
+            .hero h1 { font-size: 2.2rem; }
+            .hero .subtitle { font-size: 0.85rem; }
+            .profile-pic { width: 100px; height: 100px; }
+
+            /* 3. Empilha os Botões da Capa */
+            .hero-buttons {
+                flex-direction: column;
+                width: 100%;
+            }
+            .btn-outline { width: 100%; text-align: center; box-sizing: border-box; }
+
+            /* 4. Ajustes de Espaçamento Geral */
+            .container { padding: 4rem 1.5rem 1.5rem 1.5rem; }
+            section { margin-bottom: 4rem; padding-top: 60px; margin-top: -60px; }
+            .contact-grid { flex-direction: column; gap: 2rem; }
+        }
     </style>
 </head>
 <body>
@@ -438,8 +476,14 @@
     const canvas = document.getElementById('particleCanvas');
     const ctx = canvas.getContext('2d');
     const heroSection = document.getElementById('hero-section');
-    canvas.width = heroSection.offsetWidth;
-    canvas.height = heroSection.offsetHeight;
+    
+    // Assegura que o canvas pegue o tamanho certo mesmo em celulares
+    function resizeCanvas() {
+        canvas.width = heroSection.offsetWidth;
+        canvas.height = heroSection.offsetHeight;
+    }
+    resizeCanvas();
+
     let particlesArray = [];
     class Particle {
         constructor() {
@@ -462,7 +506,9 @@
     }
     function initParticles() {
         particlesArray = [];
-        let numberOfParticles = (canvas.width * canvas.height) / 9000;
+        // Ajuste de densidade para garantir que apareçam no celular
+        let divisor = window.innerWidth < 768 ? 6000 : 9000;
+        let numberOfParticles = (canvas.width * canvas.height) / divisor;
         for (let i = 0; i < numberOfParticles; i++) { particlesArray.push(new Particle()); }
     }
     function connectParticles() {
@@ -489,9 +535,16 @@
         connectParticles();
     }
     window.addEventListener('resize', function() {
-        canvas.width = heroSection.offsetWidth; canvas.height = heroSection.offsetHeight; initParticles();
+        resizeCanvas();
+        initParticles();
     });
-    initParticles(); animateParticles();
+
+    // Timeout para garantir que o layout renderizou antes de desenhar
+    setTimeout(() => {
+        resizeCanvas();
+        initParticles(); 
+        animateParticles();
+    }, 100);
 
     const faders = document.querySelectorAll('.fade-in-section');
     const appearOptions = { threshold: 0.15, rootMargin: "0px 0px -50px 0px" };
@@ -511,9 +564,6 @@
     var localVideoContainer = document.getElementById("localVideoContainer");
     var localVideoPlayer = document.getElementById("localVideoPlayer");
     var captionText = document.getElementById("caption");
-
-    // Variável para guardar o src do Youtube (caso use) e não perder a referência original ao fechar
-    var currentVideoSrc = "";
 
     function openModal(type, src, altText) {
         modal.classList.add("show");
@@ -542,10 +592,8 @@
         document.body.style.overflow = "auto";
         
         setTimeout(() => {
-            // Se for vídeo do Youtube, remove o src para parar o som
             videoIframe.src = ""; 
             modalImg.src = ""; 
-            // Se for vídeo local, pausa o vídeo e remove a fonte
             if(localVideoPlayer) {
                 localVideoPlayer.pause(); 
                 localVideoPlayer.src = "";
@@ -553,16 +601,13 @@
         }, 300);
     }
 
-    // Fecha ao clicar no fundo escuro (fora do conteúdo)
     window.onclick = function(event) { 
         if (event.target == modal) { closeModal(); } 
     }
     
-    // Fecha ao pressionar ESC
     document.addEventListener('keydown', function(event){ 
         if(event.key === "Escape"){ closeModal(); } 
     });
 </script>
 </body>
-
 </html>
